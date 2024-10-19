@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Function Caller</title>
+    <style>
+        body {
+            background-color: black;
+            color: white; /* Optional: Change text color to white for better readability */
+        }
+        .container {
+            width: 40%;
+            margin: auto;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        .row button {
+            margin-left: 10px;
+        }
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .input-field {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center;">
+        <h1>Mendelian Randomization</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+            <span>Extract exposure factor data (提取暴露因素数据)</span>
+            <span>
+                <button class="button" onclick="showParams('extract_instruments')">Analysis</button>
+                <button class="button" onclick="location.href='show/exposure_data'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>Extract outcome data (获取结局数据)</span>
+            <span>
+                <button class="button" onclick="showParams('extract_outcome')">Analysis</button>
+                <button class="button" onclick="location.href='show/outcome_data'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>harmonise data (统一效应等位与效应量)</span>
+            <span>
+                <button class="button" onclick="showParams('extract_harmonise')">Analysis</button>
+                <button class="button" onclick="location.href='show/harmonised_data'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>MR analysis (默认使用五种方法)</span>
+            <span>
+                <button class="button" onclick="showParams('mr_analysis')">Analysis</button>
+                <button class="button" onclick="location.href='show/mr_data'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>generate odds ratios (生成OR置信区间)</span>
+            <span>
+                <button class="button" onclick="showParams('generate_odds_ratios')">Analysis</button>
+                <button class="button" onclick="location.href='/show/OR_data'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>MR heterogeneity test (异质性检验)</span>
+            <span>
+                <button class="button" onclick="showParams('mr_heterogeneity_analysis')">Analysis</button>
+                <button class="button" onclick="location.href='/show/heterogeneity_data'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>MR pleiotropy test (水平多效性检验)</span>
+            <span>
+                <button class="button" onclick="showParams('mr_pleiotropy_test_analysis')">Analysis</button>
+                <button class="button" onclick="location.href='/show/pleiotropy_test_data'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>MR leaveoneout plot (留一图)</span>
+            <span>
+                <button class="button" onclick="showParams('mr_leaveoneout_analysis')">Analysis</button>
+                <button class="button" onclick="location.href='/show/leaveoneout_data'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>single SNP analysis (单个SNP分析)</span>
+            <span>
+                <button class="button" onclick="showParams('mr_singlesnp_analysis')">Analysis</button>
+                <button class="button" onclick="location.href='/show/singlesnp_data'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>MR scatter plot (散点图)</span>
+            <span>
+                <button class="button" onclick="showParams('mr_scatter_plot')">Analysis</button>
+                <button class="button" onclick="location.href='/show/scatter_plot'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>MR forest plot (森林图)</span>
+            <span>
+                <button class="button" onclick="showParams('mr_forest_plot')">Analysis</button>
+                <button class="button" onclick="location.href='/show/forest_plot'">Show</button>
+            </span>
+        </div>
+        <div class="row">
+            <span>MR funnel plot (漏斗图)</span>
+            <span>
+                <button class="button" onclick="showParams('mr_funnel_plot')">Analysis</button>
+                <button class="button" onclick="location.href='/show/funnel_plot'">Show</button>
+            </span>
+        </div>
+    </div>
+    <form id="dynamicForm" action="/call_function" method="post">
+        <div id="params">
+            <!-- Parameters will be added here dynamically -->
+        </div>
+        <div style="text-align: center;">
+            <button class="button" type="submit">Submit</button>
+        </div>
+    </form>
+    <script>
+        function showParams(functionName) {
+            const paramsDiv = document.getElementById('params');
+            paramsDiv.innerHTML = '<input class="input-field" type="hidden" name="function" value="' + functionName + '">';
+            if (functionName === 'extract_instruments') {
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="outcome_id">Outcome ID:</label>' +
+                '<input class="input-field" type="text" id="outcome_id" name="outcome_id">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="p1">P1 (default 5e-08):</label>' +
+                '<input class="input-field" type="number" id="p1" name="p1" value="5e-08" step="any">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="clump">Clump (default True):</label>' +
+                '<input class="input-field" type="text" id="clump" name="clump" value="True">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="p2">P2 (default 5e-08):</label>' +
+                '<input class="input-field" type="number" id="p2" name="p2" value="5e-08" step="any">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="r2">R2 (default 0.001):</label>' +
+                '<input class="input-field" type="number" id="r2" name="r2" value="0.001" step="any">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="kb">KB (default 10000):</label>' +
+                '<input class="input-field" type="number" id="kb" name="kb" value="10000" step="1">' +
+                '</div><br>';
+            } else if (functionName === 'extract_outcome') {
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="outcome_id">Outcome ID:</label>' +
+                '<input class="input-field" type="text" id="outcome_id" name="outcome_id">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="proxies">Proxies (default True):</label>' +
+                '<input class="input-field" type="text" id="proxies" name="proxies" value="True">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="rsq">RSQ (default 0.8):</label>' +
+                '<input class="input-field" type="number" id="rsq" name="rsq" value="0.08" step="any">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="align_alleles">Align_alleles (default 1):</label>' +
+                '<input class="input-field" type="number" id="align_alleles" name="align_alleles" value="1" step="any">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="palindromes">palindromes (default 1):</label>' +
+                '<input class="input-field" type="number" id="palindromes" name="palindromes" value="1" step="any">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="maf_threshold">maf_threshold (default 0.3):</label>' +
+                '<input class="input-field" type="number" id="maf_threshold" name="maf_threshold" value="0.3" step="any">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="splitsize">splitsize (default 10000):</label>' +
+                '<input class="input-field" type="number" id="splitsize" name="splitsize" value="10000" step="any">' +
+                '</div><br>';
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="proxy_splitsize">proxy_splitsize (default 500):</label>' +
+                '<input class="input-field" type="number" id="proxy_splitsize" name="proxy_splitsize" value="500" step="any">' +
+                '</div><br>';
+            } else if (functionName === 'extract_harmonise') {
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="action">action (default 2):</label>' +
+                '<input class="input-field" type="number" id="action" name="action" value="2" step="any">' +
+                '</div><br>';
+            } else if (functionName === 'mr_analysis') {
+                paramsDiv.innerHTML += '<div style="text-align: center;">' +
+                '<label for="method_list">Method List:</label>' +
+                '<input class="input-field" type="text" id="method_list" name="method_list">' +
+                '</div><br>';
+            } else if (functionName === 'generate_odds_ratios') {
+                // paramsDiv.innerHTML += '<label for="beta">Beta:</label>';
+                // paramsDiv.innerHTML += '<input class="input-field" type="number" id="beta" name="beta" step="any"><br>';
+            } else if (functionName === 'mr_heterogeneity_analysis') {
+                // paramsDiv.innerHTML += '<label for="method_list">Method List:</label>';
+                // paramsDiv.innerHTML += '<input class="input-field" type="text" id="method_list" name="method_list"><br>';
+            } else if (functionName === 'mr_pleiotropy_test_analysis') {
+                // paramsDiv.innerHTML += '<label for="method_list">Method List:</label>';
+                // paramsDiv.innerHTML += '<input class="input-field" type="text" id="method_list" name="method_list"><br>';
+            } else if (functionName === 'mr_leaveoneout_analysis') {
+                // paramsDiv.innerHTML += '<label for="data">Data:</label>';
+                // paramsDiv.innerHTML += '<input class="input-field" type="text" id="data" name="data"><br>';
+            } else if (functionName === 'mr_scatter_plot') {
+                // paramsDiv.innerHTML += '<label for="data">Data:</label>';
+                // paramsDiv.innerHTML += '<input class="input-field" type="text" id="data" name="data"><br>';
+            } else if (functionName === 'mr_forest_plot') {
+                // paramsDiv.innerHTML += '<label for="data">Data:</label>';
+                // paramsDiv.innerHTML += '<input class="input-field" type="text" id="data" name="data"><br>';
+            } else if (functionName === 'mr_funnel_plot') {
+                // paramsDiv.innerHTML += '<label for="data">Data:</label>';
+                // paramsDiv.innerHTML += '<input class="input-field" type="text" id="data" name="data"><br>';
+            }
+            document.getElementById('dynamicForm').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

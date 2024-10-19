@@ -1,0 +1,42 @@
+<!-- templates/result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <script>
+        const result = {{ result | tojson | safe }};
+    </script>
+    <h1>Result</h1>
+    {% if result %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <!-- 动态生成表头 -->
+                    {% for column in result[0].keys() %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 动态生成表格内容 -->
+                {% for row in result %}
+                    <tr>
+                        {% for cell in row.values() %}
+                            <td>{{ cell }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% if plot_path %}
+        <h2>Plot</h2>
+        <img src="{{ url_for('static', filename=plot_path) }}" alt="Plot" class="responsive-img">
+    {% endif %}
+    <a href="/" class="top-left">Back</a>
+</body>
+</html>
